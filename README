@@ -1,0 +1,5 @@
+Driver for dual-port Isolated CAN interface card
+
+Currently written for kernel version 2.6.35.9
+
+udev supported
