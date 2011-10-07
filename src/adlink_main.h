@@ -1,3 +1,5 @@
+#ifndef __ADLINK_MAIN_H__
+#define __ADLINK_MAIN_H__
 /* 
  * Driver for dual-port isolated CAN interface card
  * Copyright (C) 2011  Peter Kotvan <peter.kotvan@gmail.com>
@@ -14,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #include <adlink_common.h>
 
 #include <linux/types.h>
@@ -73,6 +74,12 @@ struct pcanctx_rt;
 #define CAN_ERROR_PASSIVE    1  /* receive only state */
 #define CAN_BUS_OFF          2  /* switched off from Bus */
 
+typedef struct chn_props        /* this structure holds various channel properties */
+{
+	u8 ucExternalClock : 1;         /* this device is supplied with a external clock */
+	u8 ucMasterDevice  : 2;         /* this channel is a clock master, slave, single */
+} CHN_PROPS;
+
 
 /**
  * @brief a helper for fast conversion between 'SJA1000' data ordering and host data order
@@ -90,7 +97,7 @@ typedef struct
     void *bufferBegin;          /* points to first element */
     void *bufferEnd;            /* points to last element */
     u32 nCount;                 /* max counts of elements in fifo */
-    u32 nStored                 /* count of currently stored messages */
+    u32 nStored;                 /* count of currently stored messages */
       u32 dwTotal;              /* received messages */
     void *r;                    /* nest Msg to read into the read buffer */
     void *w;                    /* next Msg to write into the read buffer */
@@ -121,8 +128,9 @@ typedef struct pcandev
 
     union
     {
-        DONGLE_PORT dng;        /* private data of the various ports */
-        ISA_PORT isa;
+/*         DONGLE_PORT dng;         private data of the various ports 
+ *         ISA_PORT isa;
+ */
         PCI_PORT pci;
     } port;
 
@@ -227,3 +235,5 @@ int pcan_chardev_rx (struct pcandev *dev, struct can_frame *cf, struct timeval *
 void dev_unregister (void);
 
 void remove_dev_list (void);
+
+#endif                          /* __ADLINK_MAIN_H__ */

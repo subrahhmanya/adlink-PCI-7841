@@ -1,3 +1,5 @@
+#ifndef __ADLINK_COMMON_H__
+#define __ADLINK_COMMON_H__
 /* 
  * Driver for dual-port isolated CAN interface card
  * Copyright (C) 2011  Peter Kotvan <peter.kotvan@gmail.com>
@@ -83,3 +85,5 @@ rt_gettimeofday (struct timeval *tv)
  * name of the module and proc entry
  */
 #define DEVICE_NAME "adlink"
+
+#endif                          /* __ADLINK_COMMON_H__ */

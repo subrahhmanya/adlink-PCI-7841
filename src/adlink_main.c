@@ -22,17 +22,44 @@
 #include <adlink_common.h>
 
 #include <linux/module.h>
-#include <linux/kernel.h>       // DPRINTK()
-#include <linux/slab.h>         // kmalloc()
-#include <linux/fs.h>           // everything...
-#include <linux/errno.h>        // error codes
-#include <linux/types.h>        // size_t
-#include <linux/proc_fs.h>      // proc
-#include <linux/fcntl.h>        // O_ACCMODE
-#include <linux/capability.h>   // all about restrictions
-#include <linux/param.h>        // because of HZ
-#include <asm/system.h>         // cli(), *_flags
-#include <asm/uaccess.h>        // copy_...
+#include <linux/kernel.h>       /* DPRINTK() */
+#include <linux/slab.h>         /* kmalloc() */
+#include <linux/fs.h>           /* everything... */
+#include <linux/errno.h>        /* error codes */
+#include <linux/types.h>            /* size_t */
+#include <linux/proc_fs.h>          /* proc */
+#include <linux/fcntl.h>            /* O_ACCMODE */
+#include <linux/capability.h>       /* all about restrictions */
+#include <linux/param.h>            /* because of HZ */
+#include <asm/system.h>         /* cli(), *_flags */
+#include <asm/uaccess.h>            /* copy_... */
+
+#include <adlink_main.h>
+#include <adlink_pci.h>
+#include <adlink_fops.h>
+#include <adlink_fifo.h>
+#include <adlink_filter.h>
+
+/**
+ * Default defines
+ */
+#define DEFAULT_BTR0BTR1    CAN_BAUD_500K  // defaults to 500 kbit/sec
+#define DEFAULT_EXTENDED    1              // catch all frames
+#define DEFAULT_LISTENONLY  0
+
+/**
+ * Globals
+ */
+/* filled by module initialization */
+char *type[8] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+u16  io[8]    = {0, 0, 0, 0, 0, 0, 0, 0};
+u8   irq[8]   = {0, 0, 0, 0, 0, 0, 0, 0};
+u16  bitrate  = DEFAULT_BTR0BTR1;
+char *assign  = NULL;
+
+struct driverobj pcan_drv = {};
+
+#include <linux/device.h>
 
 void
 cleanup_module (void)
@@ -46,3 +73,8 @@ init_module (void)
 
     return 0;
 }
+
+MODULE_AUTHOR("peter.kotvan@gmail.com");
+MODULE_DESCRIPTION("Driver for dual-port isolated CAN interface card");
+MODULE_SUPPORTED_DEVICE("adlink PCI-7841");
+MODULE_LICENSE("GPL");
