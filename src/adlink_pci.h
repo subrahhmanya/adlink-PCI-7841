@@ -19,13 +19,13 @@
 #include <adlink_main.h>
 
 #ifdef PCIEC_SUPPORT
-int  pcan_pci_init(void);
-void pcan_pci_deinit(void);
+int pcan_pci_init (void);
+void pcan_pci_deinit (void);
 #else
-int  pcan_search_and_create_pci_devices(void);
+int pcan_search_and_create_pci_devices (void);
 #endif
 
-void pcan_pci_clear_stored_interrupt(struct pcandev *dev);
-void pcan_pci_enable_interrupt(struct pcandev *dev);
+void pcan_pci_clear_stored_interrupt (struct pcandev *dev);
+void pcan_pci_enable_interrupt (struct pcandev *dev);
 
-#endif                          /* __ADLINK_PCI_H__ */
+#endif /* __ADLINK_PCI_H__ */

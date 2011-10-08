@@ -76,8 +76,8 @@ struct pcanctx_rt;
 
 typedef struct chn_props        /* this structure holds various channel properties */
 {
-	u8 ucExternalClock : 1;         /* this device is supplied with a external clock */
-	u8 ucMasterDevice  : 2;         /* this channel is a clock master, slave, single */
+    u8 ucExternalClock:1;       /* this device is supplied with a external clock */
+    u8 ucMasterDevice:2;        /* this channel is a clock master, slave, single */
 } CHN_PROPS;
 
 
@@ -97,8 +97,8 @@ typedef struct
     void *bufferBegin;          /* points to first element */
     void *bufferEnd;            /* points to last element */
     u32 nCount;                 /* max counts of elements in fifo */
-    u32 nStored;                 /* count of currently stored messages */
-      u32 dwTotal;              /* received messages */
+    u32 nStored;                /* count of currently stored messages */
+    u32 dwTotal;                /* received messages */
     void *r;                    /* nest Msg to read into the read buffer */
     void *w;                    /* next Msg to write into the read buffer */
     spinlock_t lock;            /* mutual exclusion lock */
@@ -128,9 +128,9 @@ typedef struct pcandev
 
     union
     {
-/*         DONGLE_PORT dng;         private data of the various ports 
- *         ISA_PORT isa;
- */
+        /*         DONGLE_PORT dng;         private data of the various ports 
+         *         ISA_PORT isa;
+         */
         PCI_PORT pci;
     } port;
 
@@ -236,4 +236,4 @@ void dev_unregister (void);
 
 void remove_dev_list (void);
 
-#endif                          /* __ADLINK_MAIN_H__ */
+#endif /* __ADLINK_MAIN_H__ */

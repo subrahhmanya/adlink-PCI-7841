@@ -86,4 +86,4 @@ rt_gettimeofday (struct timeval *tv)
  */
 #define DEVICE_NAME "adlink"
 
-#endif                          /* __ADLINK_COMMON_H__ */
+#endif /* __ADLINK_COMMON_H__ */

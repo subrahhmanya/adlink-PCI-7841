@@ -19,12 +19,13 @@
 
 #include <adlink_main.h>
 
-int pcan_fifo_reset(register FIFO_MANAGER *anchor);
-int pcan_fifo_init(register FIFO_MANAGER *anchor, void *bufferBegin, void *bufferEnd, int nCount, u16 wCopySize);
-int pcan_fifo_put(register FIFO_MANAGER *anchor, void *pvPutData);
-int pcan_fifo_get(register FIFO_MANAGER *anchor, void *pvPutData);
-int pcan_fifo_status(FIFO_MANAGER *anchor);
-int pcan_fifo_not_full(FIFO_MANAGER *anchor);
-int pcan_fifo_empty(FIFO_MANAGER *anchor);
+int pcan_fifo_reset (register FIFO_MANAGER * anchor);
+int pcan_fifo_init (register FIFO_MANAGER * anchor, void *bufferBegin, void *bufferEnd, int nCount,
+                    u16 wCopySize);
+int pcan_fifo_put (register FIFO_MANAGER * anchor, void *pvPutData);
+int pcan_fifo_get (register FIFO_MANAGER * anchor, void *pvPutData);
+int pcan_fifo_status (FIFO_MANAGER * anchor);
+int pcan_fifo_not_full (FIFO_MANAGER * anchor);
+int pcan_fifo_empty (FIFO_MANAGER * anchor);
 
-#endif                          /* __PCAN_FIFO_H__ */
+#endif /* __PCAN_FIFO_H__ */

@@ -19,10 +19,10 @@
 
 #include <linux/types.h>
 
-void *pcan_create_filter_chain(void); // returns a handle pointer
-int   pcan_add_filter(void *handle, u32 FromID, u32 ToID, u8 MSGTYPE);
-void  pcan_delete_filter_all(void *handle);
-int   pcan_do_filter(void *handle, u32 can_id); // take the netdev can_id as input
-void  pcan_delete_filter_chain(void *handle);
+void *pcan_create_filter_chain (void);  // returns a handle pointer
+int pcan_add_filter (void *handle, u32 FromID, u32 ToID, u8 MSGTYPE);
+void pcan_delete_filter_all (void *handle);
+int pcan_do_filter (void *handle, u32 can_id);  // take the netdev can_id as input
+void pcan_delete_filter_chain (void *handle);
 
-#endif                          /* __PCAN_FILTER_H__ */
+#endif /* __PCAN_FILTER_H__ */
