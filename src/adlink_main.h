@@ -50,6 +50,7 @@ struct pcanctx_rt;
 
 #define READBUFFER_SIZE      80 /* read and write buffers */
 #define WRITEBUFFER_SIZE     80
+#define PCAN_MAJOR            0 /* use dynamic major allocation, else use 91 */
 #define READ_MESSAGE_COUNT  500 /* read and write message count */
 #define WRITE_MESSAGE_COUNT  50
 
@@ -204,7 +205,7 @@ typedef struct driverobj
     u16 wInitStep;              /* driver specific init state */
     struct timeval sInitTime;   /* time in usec when init was called */
     struct list_head devices;   /* base of list of devices */
-    u8 *szVersionString;        /* pointer to the driver version string */
+//    u8 *szVersionString;        /* pointer to the driver version string */
 
     struct pci_driver pci_drv;  /* pci driver structure */
 

@@ -352,7 +352,7 @@ void remove_dev_list(void)
   }
 }
 
-/* called when device is removed (rmmod adlink) */
+/* called when device is removed (rmmod adlink.ko) */
 void
 cleanup_module (void)
 {
@@ -414,11 +414,71 @@ void pcan_soft_init(struct pcandev *dev, char *szType, u16 wType)
   INIT_LOCK(&dev->isr_lock);
 }
 
+/* called when device is installed (insmod adlink.ko) */
 int
 init_module (void)
 {
     int result = 0;
 
+  memset(&pcan_drv, 0, sizeof(pcan_drv));
+  pcan_drv.wInitStep       = 0;
+  DO_GETTIMEOFDAY(pcan_drv.sInitTime); // store time for timestamp relation, increments in usec
+//  pcan_drv.szVersionString = CURRENT_RELEASE; // get the release name global
+  pcan_drv.nMajor          = PCAN_MAJOR;
+
+//  printk(KERN_INFO "[%s] %s ", DEVICE_NAME, pcan_drv.szVersionString);
+#if defined(__BIG_ENDIAN)
+  printk("(be)\n");
+#elif defined(__LITTLE_ENDIAN)
+  printk("(le)\n");
+#else
+#error Endian not set
+#endif
+//  printk(KERN_INFO "[%s] driver config%s\n", DEVICE_NAME, current_config);
+  #ifdef DEBUG
+  printk(KERN_INFO "[%s] DEBUG is switched on\n", DEVICE_NAME);
+  #endif
+
+  INIT_LIST_HEAD(&pcan_drv.devices);
+  INIT_LIST_HEAD(&device_list);
+
+  pcan_drv.wDeviceCount = 0;
+  pcan_drv.class = class_create(THIS_MODULE , "adlink");
+  pcan_drv.wInitStep = 1;
+
+/* search PCI */
+  if ((result = pcan_search_and_create_pci_devices()))
+    goto fail;
+
+  // no device found, stop all
+  if (!pcan_drv.wDeviceCount)
+    goto fail;
+
+  pcan_drv.wInitStep = 2;
+
+  result = rt_dev_register();
+  if (result < 0)
+    goto fail;
+
+  if (!pcan_drv.nMajor)
+    pcan_drv.nMajor = result;
+
+  pcan_drv.wInitStep = 3;
+
+  // create the proc entry
+  if (create_proc_read_entry(DEVICE_NAME, 0, NULL, pcan_read_procmem, NULL) == NULL)
+  {
+    result = -ENODEV; // maybe wrong if there is no proc filesystem configured
+    goto fail;
+  }
+
+  pcan_drv.wInitStep = 4;
+
+  printk(KERN_INFO "[%s] major %d.\n", DEVICE_NAME, pcan_drv.nMajor);
+  return 0; // succeed
+
+  fail:
+  cleanup_module();
     return result;
 }
 
