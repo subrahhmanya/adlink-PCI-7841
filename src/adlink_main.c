@@ -65,9 +65,7 @@ struct list_head device_list;
 
 #include <linux/device.h>
 
-/* for procfs output */
-char config[] = "*----------------------------------------------------------------------------";
-
+/* Real time (RTDM) functions */
 static int
 rt_dev_register (void)
 {
@@ -166,19 +164,262 @@ pcan_chardev_rx (struct pcandev *dev, struct can_frame *cf, struct timeval *tv)
 
     return result;
 }
+/* end of real time functions */
 
+/* convert struct can_frame to struct TPCANMsg
+ * To reduce the complexity (and CPU usage) there are no checks (e.g. for dlc)
+ * here as it is assumed that the creator of the source struct has done this work
+ */
+void frame2msg(struct can_frame *cf, TPCANMsg *msg)
+{
+  if (cf->can_id & CAN_ERR_FLAG)
+  {
+    memset(msg, 0, sizeof(*msg));
+    msg->MSGTYPE = MSGTYPE_STATUS;
+    msg->LEN     = 4;
 
+    if (cf->can_id & CAN_ERR_CRTL)
+    {
+        /* handle data overrun */
+      if (cf->data[1] & CAN_ERR_CRTL_RX_OVERFLOW)
+        msg->DATA[3] |= CAN_ERR_OVERRUN;
+
+        /* handle CAN_ERR_BUSHEAVY */
+      if (cf->data[1] & CAN_ERR_CRTL_RX_WARNING)
+        msg->DATA[3] |= CAN_ERR_BUSHEAVY;
+    }
+
+    if (cf->can_id & CAN_ERR_BUSOFF_NETDEV)
+      msg->DATA[3] |= CAN_ERR_BUSOFF;
+
+    return;
+  }
+
+  if (cf->can_id & CAN_RTR_FLAG)
+    msg->MSGTYPE = MSGTYPE_RTR;
+  else
+    msg->MSGTYPE = MSGTYPE_STANDARD;
+
+  if (cf->can_id & CAN_EFF_FLAG)
+    msg->MSGTYPE |= MSGTYPE_EXTENDED;
+
+  msg->ID  = cf->can_id & CAN_EFF_MASK; /* remove EFF/RTR/ERR flags */
+  msg->LEN = cf->can_dlc; /* no need to check value range here */
+
+  memcpy(&msg->DATA[0], &cf->data[0], 8); /* also copy trailing zeros */
+}
+
+/* convert struct TPCANMsg to struct can_frame
+ * To reduce the complexity (and CPU usage) there are no checks (e.g. for dlc)
+ * here as it is assumed that the creator of the source struct has done this work
+ */
+void msg2frame(struct can_frame *cf, TPCANMsg *msg)
+{
+  cf->can_id = msg->ID;
+
+  if (msg->MSGTYPE & MSGTYPE_RTR)
+    cf->can_id |= CAN_RTR_FLAG;
+
+  if (msg->MSGTYPE & MSGTYPE_EXTENDED)
+    cf->can_id |= CAN_EFF_FLAG;
+
+    /* if (msg->MSGTYPE & MSGTYPE_??????) */
+    /*   cf->can_id |= CAN_ERR_FLAG; */
+
+  cf->can_dlc = msg->LEN; /* no need to check value range here */
+
+  memcpy(&cf->data[0], &msg->DATA[0], 8); /* also copy trailing zeros */
+}
+
+/* request time in msec, fast */
+u32 get_mtime(void)
+{
+  return (jiffies / HZ) * 1000;
+}
+
+/* x = (x >= y) ? x - y : 0; */
+static void subtract_timeval(struct timeval *x, struct timeval *y)
+{
+  if (x->tv_usec >= y->tv_usec)
+    x->tv_usec -= y->tv_usec;
+  else
+  {
+    if (x->tv_sec)
+    {
+      x->tv_sec--;
+      x->tv_usec += (1000000 - y->tv_usec);
+    }
+    else
+      goto fail;
+  }
+
+  if (x->tv_sec >= y->tv_sec)
+  {
+    x->tv_sec -= y->tv_sec;
+    return;
+  }
+
+  fail:
+  x->tv_sec = x->tv_usec = 0;
+}
+
+/* get relative time to start of driver */
+void get_relative_time(struct timeval *tv, struct timeval *tr)
+{
+  if (!tv)
+    DO_GETTIMEOFDAY((*tr));
+  else
+    memcpy(tr, tv, sizeof(*tr));
+
+  subtract_timeval(tr, &pcan_drv.sInitTime);
+}
+
+/* convert timeval to pcan used milliseconds / microseconds notation */
+void timeval2pcan(struct timeval *tv, u32 *msecs, u16 *usecs)
+{
+  *msecs = (u32)(tv->tv_sec * 1000 + tv->tv_usec / 1000);
+  *usecs = (u16)(tv->tv_usec % 1000);
+}
+
+/* is called when 'cat /proc/pcan' invoked */
+static int pcan_read_procmem(char *page, char **start, off_t offset, int count, int *eof, void *data)
+{
+  struct pcandev *dev;
+  struct list_head *ptr;
+  int    len = 0;
+
+  DPRINTK(KERN_DEBUG "[%s] pcan_read_procmem()\n", DEVICE_NAME);
+
+  len += sprintf(page + len, "\n");
+  len += sprintf(page + len, "*----------------- ADLINK PCI-7841 dual-port CAN interface ------------------\n");
+/*   len += sprintf(page + len, "*-------------------------- %s (%s) ----------------------\n", pcan_drv.szVersionString, CURRENT_VERSIONSTRING);
+ */
+  len += sprintf(page + len, "*--------------------- %d interfaces @ major %03d found -----------------------\n",
+                     pcan_drv.wDeviceCount, pcan_drv.nMajor);
+  len += sprintf(page + len, "*n -type- ndev --base-- irq --btr- --read-- --write- --irqs-- -errors- status\n");
+
+  /* loop trough my devices */
+  for (ptr = pcan_drv.devices.next; ptr != &pcan_drv.devices; ptr = ptr->next)
+  {
+    u32 dwPort = 0;
+    u16 wIrq   = 0;
+
+    dev = (struct pcandev *)ptr;
+    switch (dev->wType)
+    {
+      case HW_PCI:
+        dwPort = dev->port.pci.dwPort;
+        wIrq   = dev->port.pci.wIrq;
+        break;
+    }
+
+    len += sprintf(page + len, "%2d %6s %4s %08x %03d 0x%04x %08lx %08lx %08x %08x 0x%04x\n",
+                   dev->nMinor,
+                   dev->type,
+                   "-NA-",
+                   dwPort,
+                   wIrq,
+                   dev->wBTR0BTR1,
+                   (unsigned long)dev->readFifo.dwTotal,
+                   (unsigned long)dev->writeFifo.dwTotal,
+                   dev->dwInterruptCounter,
+                   dev->dwErrorCounter,
+                   dev->wCANStatus);
+  }
+
+  len += sprintf(page + len, "\n");
+
+  *eof = 1;
+  return len;
+}
+
+void remove_dev_list(void)
+{
+  struct pcandev *dev;
+  struct list_head *pos;
+  struct list_head *n;
+
+  list_for_each_prev_safe(pos, n, &pcan_drv.devices)
+  {
+    dev = list_entry(pos, struct pcandev, list);
+    if (dev->cleanup != NULL)
+    {
+      dev->cleanup(dev);
+      list_del(&dev->list);
+      /* free all device allocated memory */
+      kfree(dev);
+    }
+  }
+}
+
+/* called when device is removed (rmmod adlink) */
 void
 cleanup_module (void)
 {
+  DPRINTK(KERN_DEBUG "[%s] cleanup_module()\n", DEVICE_NAME);
 
+  switch (pcan_drv.wInitStep)
+  {
+    case 4: remove_proc_entry(DEVICE_NAME, NULL);
+    case 3: rt_dev_unregister();
+    case 1:
+            class_destroy(pcan_drv.class);
+            rt_remove_dev_list();
+
+    case 0:
+           pcan_drv.wInitStep = 0;
+  }
+
+  printk(KERN_INFO "[%s] removed.\n", DEVICE_NAME);
+
+}
+
+/* init some equal parts of dev */
+void pcan_soft_init(struct pcandev *dev, char *szType, u16 wType)
+{
+  dev->wType            = wType;
+  dev->type             = szType;
+
+  dev->nOpenPaths       = 0;
+  dev->nLastError       = 0;
+  dev->busStatus        = CAN_ERROR_ACTIVE;
+  dev->dwErrorCounter   = 0;
+  dev->dwInterruptCounter = 0;
+  dev->wCANStatus       = 0;
+  dev->bExtended        = 1;        /* accept all frames */
+  dev->wBTR0BTR1        = bitrate;
+  dev->ucCANMsgType     = DEFAULT_EXTENDED;
+  dev->ucListenOnly     = DEFAULT_LISTENONLY;
+
+  memset(&dev->props, 0, sizeof(dev->props));
+
+  /* set default access functions */
+  dev->device_open      = NULL;
+  dev->device_release   = NULL;
+  dev->device_write     = NULL;
+  dev->cleanup          = NULL;
+
+  dev->device_params    = NULL;         /* the default */
+
+  dev->ucPhysicallyInstalled = 0;       /* assume the device is not installed */
+  dev->ucActivityState       = ACTIVITY_NONE;
+
+  atomic_set(&dev->DataSendReady, 1);
+
+  /* init fifos */
+  pcan_fifo_init(&dev->readFifo,   &dev->rMsg[0], &dev->rMsg[READ_MESSAGE_COUNT - 1],  READ_MESSAGE_COUNT,  sizeof(TPCANRdMsg));
+  pcan_fifo_init(&dev->writeFifo,  &dev->wMsg[0], &dev->wMsg[WRITE_MESSAGE_COUNT - 1], WRITE_MESSAGE_COUNT, sizeof(TPCANMsg) );
+
+  INIT_LOCK(&dev->wlock);
+  INIT_LOCK(&dev->isr_lock);
 }
 
 int
 init_module (void)
 {
+    int result = 0;
 
-    return 0;
+    return result;
 }
 
 MODULE_AUTHOR ("peter.kotvan@gmail.com");

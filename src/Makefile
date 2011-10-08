@@ -7,7 +7,7 @@ endif
 
 
 obj-m := adlink.o
-adlink-objs := adlink_main.o
+adlink-objs := adlink_main.o adlink_fifo.o
 
 EXTRA_CFLAGS := -I$(PWD) -I/usr/include -I/usr/realtime/include 
 
