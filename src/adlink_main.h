@@ -205,7 +205,7 @@ typedef struct driverobj
     u16 wInitStep;              /* driver specific init state */
     struct timeval sInitTime;   /* time in usec when init was called */
     struct list_head devices;   /* base of list of devices */
-//    u8 *szVersionString;        /* pointer to the driver version string */
+    //    u8 *szVersionString;        /* pointer to the driver version string */
 
     struct pci_driver pci_drv;  /* pci driver structure */
 
