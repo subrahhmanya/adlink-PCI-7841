@@ -45,8 +45,8 @@ struct pcanctx_rt;
 
 /* Defines */
 #define CHANNEL_SINGLE 0
-#define CHANNEL_MASTER
-#define CHANNEL_SLAVE
+#define CHANNEL_MASTER 1
+#define CHANNEL_SLAVE  2
 
 #define READBUFFER_SIZE      80 /* read and write buffers */
 #define WRITEBUFFER_SIZE     80
