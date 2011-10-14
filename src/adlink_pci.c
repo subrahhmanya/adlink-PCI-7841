@@ -252,7 +252,7 @@ static int  pcan_pci_channel_init(struct pcandev *dev, u32 dwConfigPort, u32 dwP
 }
 
 /**
- * create one pci based devices - this may be one of multiple from a card
+ * create one pci based device - this may be one of multiple from a card
  */
 static int create_one_pci_device(struct pci_dev *pciDev, int nChannel, struct pcandev *master_dev, struct pcandev **dev)
 {
