@@ -21,19 +21,19 @@
  * prototypes for sja1000 access functions
  */
 #include <linux/types.h>
-#include <linux/interrupt.h> // 2.6. special
+#include <linux/interrupt.h>    // 2.6. special
 #include <adlink_common.h>
 #include <adlink_main.h>
 
-int  sja1000_open(struct pcandev *dev, u16 btr0btr1, u8 bExtended, u8 bListenOnly);
-void sja1000_release(struct pcandev *dev);
+int sja1000_open (struct pcandev *dev, u16 btr0btr1, u8 bExtended, u8 bListenOnly);
+void sja1000_release (struct pcandev *dev);
 
-int sja1000_write(struct pcandev *dev, struct pcanctx_rt *ctx);
-int sja1000_irqhandler_rt(rtdm_irq_t *irq_context);
-int sja1000_irqhandler_common(struct pcandev *dev, struct pcanctx_rt *ctx);
-int  sja1000_write_frame(struct pcandev *dev, struct can_frame *cf);
+int sja1000_write (struct pcandev *dev, struct pcanctx_rt *ctx);
+int sja1000_irqhandler_rt (rtdm_irq_t * irq_context);
+int sja1000_irqhandler_common (struct pcandev *dev, struct pcanctx_rt *ctx);
+int sja1000_write_frame (struct pcandev *dev, struct can_frame *cf);
 
-int  sja1000_probe(struct pcandev *dev);
-u16  sja1000_bitrate(u32 dwBitRate);
+int sja1000_probe (struct pcandev *dev);
+u16 sja1000_bitrate (u32 dwBitRate);
 
 #endif /* __SJA1000_H__ */

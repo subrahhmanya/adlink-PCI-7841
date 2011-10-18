@@ -440,11 +440,9 @@ init_module (void)
 
     memset (&pcan_drv, 0, sizeof (pcan_drv));
     pcan_drv.wInitStep = 0;
-    DO_GETTIMEOFDAY (pcan_drv.sInitTime);       // store time for timestamp relation, increments in usec
-    //  pcan_drv.szVersionString = CURRENT_RELEASE; // get the release name global
+    DO_GETTIMEOFDAY (pcan_drv.sInitTime);       /* store time for timestamp relation, increments in usec */
     pcan_drv.nMajor = PCAN_MAJOR;
 
-    //  printk(KERN_INFO "[%s] %s ", DEVICE_NAME, pcan_drv.szVersionString);
 #if defined(__BIG_ENDIAN)
     printk ("(be)\n");
 #elif defined(__LITTLE_ENDIAN)
@@ -452,7 +450,6 @@ init_module (void)
 #else
 #error Endian not set
 #endif
-    //  printk(KERN_INFO "[%s] driver config%s\n", DEVICE_NAME, current_config);
 #ifdef DEBUG
     printk (KERN_INFO "[%s] DEBUG is switched on\n", DEVICE_NAME);
 #endif

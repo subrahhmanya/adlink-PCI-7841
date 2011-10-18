@@ -23,9 +23,9 @@
 
 #include <pcan.h>
 
-int pcan_make_output(char *buffer, TPCANRdMsg *m);
-int pcan_parse_input_idle(char *buffer);
-int pcan_parse_input_message(char *buffer, TPCANMsg *Message);
-int pcan_parse_input_init(char *buffer, TPCANInit *Init);
+int pcan_make_output (char *buffer, TPCANRdMsg * m);
+int pcan_parse_input_idle (char *buffer);
+int pcan_parse_input_message (char *buffer, TPCANMsg * Message);
+int pcan_parse_input_init (char *buffer, TPCANInit * Init);
 
 #endif /* __PCAN_PARSE_H__ */

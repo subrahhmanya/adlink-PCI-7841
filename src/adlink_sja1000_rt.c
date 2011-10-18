@@ -40,14 +40,14 @@
 //****************************************************************************
 // CODE
 
-int sja1000_irqhandler_rt(rtdm_irq_t *irq_context)
+int
+sja1000_irqhandler_rt (rtdm_irq_t * irq_context)
 {
-  struct pcanctx_rt *ctx;
-  struct pcandev *dev;
+    struct pcanctx_rt *ctx;
+    struct pcandev *dev;
 
-  ctx = rtdm_irq_get_arg(irq_context, struct pcanctx_rt);
-  dev = ctx->dev;
+    ctx = rtdm_irq_get_arg (irq_context, struct pcanctx_rt);
+    dev = ctx->dev;
 
-  return sja1000_irqhandler_common(dev, ctx);
+    return sja1000_irqhandler_common (dev, ctx);
 }
-
