@@ -146,7 +146,7 @@ pcan_parse_input_idle (char *buffer)
 {
     char *ptr = buffer;
 
-    /* DPRINTK(KERN_DEBUG "%s: pcan_parse_input_idle()\n", DEVICE_NAME); */
+    /* DPRINTK(KERN_DEBUG "[%s]: pcan_parse_input_idle()\n", DEVICE_NAME); */
 
     /* remove leading blanks */
     skip_blanks (&ptr);
@@ -173,7 +173,7 @@ pcan_parse_input_message (char *buffer, TPCANMsg * Message)
     int i;
     int err = -EINVAL;
 
-    /* DPRINTK(KERN_DEBUG "%s: pcan_parse_input_message()\n", DEVICE_NAME); */
+    /* DPRINTK(KERN_DEBUG "[%s]: pcan_parse_input_message()\n", DEVICE_NAME); */
 
     /* remove leading blanks */
     skip_blanks (&ptr);
@@ -248,11 +248,11 @@ pcan_parse_input_message (char *buffer, TPCANMsg * Message)
         i++;
     }
 
-    /* DPRINTK(KERN_DEBUG "%s: pcan_parse_input_message() is OK\n", DEVICE_NAME); */
+    /* DPRINTK(KERN_DEBUG "[%s]: pcan_parse_input_message() is OK\n", DEVICE_NAME); */
     return 0;
 
   reject:
-    /* DPRINTK(KERN_DEBUG "%s: reject in pcan_parse_input_message()\n", DEVICE_NAME); */
+    /* DPRINTK(KERN_DEBUG "[%s]: reject in pcan_parse_input_message()\n", DEVICE_NAME); */
     return err;
 }
 
@@ -265,7 +265,7 @@ pcan_parse_input_init (char *buffer, TPCANInit * Init)
     u32 dwDummy;
     int err = -EINVAL;
 
-    /* DPRINTK(KERN_DEBUG "%s: pcan_parse_input_init()\n", DEVICE_NAME); */
+    /* DPRINTK(KERN_DEBUG "[%s]: pcan_parse_input_init()\n", DEVICE_NAME); */
 
     /* remove leading blanks */
     skip_blanks (&ptr);
@@ -309,10 +309,10 @@ pcan_parse_input_init (char *buffer, TPCANInit * Init)
         }
     }
 
-    /* DPRINTK(KERN_DEBUG "%s: pcan_parse_input_init() is OK\n", DEVICE_NAME); */
+    /* DPRINTK(KERN_DEBUG "[%s]: pcan_parse_input_init() is OK\n", DEVICE_NAME); */
     return 0;
 
   reject:
-    /* DPRINTK(KERN_DEBUG "%s: reject in pcan_parse_input_init()\n", DEVICE_NAME); */
+    /* DPRINTK(KERN_DEBUG "[%s]: reject in pcan_parse_input_init()\n", DEVICE_NAME); */
     return err;
 }

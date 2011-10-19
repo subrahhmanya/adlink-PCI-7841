@@ -327,7 +327,7 @@ sja1000_open (struct pcandev *dev, u16 btr0btr1, u8 bExtended, u8 bListenOnly)
     u8 _clkdivider = clkdivider (dev);
     u8 ucModifier = (bListenOnly) ? LISTEN_ONLY_MODE : NORMAL_MODE;
 
-    DPRINTK (KERN_DEBUG "%s: %s(), minor = %d.\n", DEVICE_NAME, __FUNCTION__, dev->nMinor);
+    DPRINTK (KERN_DEBUG "[%s]: %s(), minor = %d.\n", DEVICE_NAME, __FUNCTION__, dev->nMinor);
 
     /* switch to reset */
     result = set_reset_mode (dev);
@@ -387,7 +387,7 @@ sja1000_open (struct pcandev *dev, u16 btr0btr1, u8 bExtended, u8 bListenOnly)
 void
 sja1000_release (struct pcandev *dev)
 {
-    DPRINTK (KERN_DEBUG "%s: %s()\n", DEVICE_NAME, __FUNCTION__);
+    DPRINTK (KERN_DEBUG "[%s]: %s()\n", DEVICE_NAME, __FUNCTION__);
 
     /* abort pending transmissions */
     guarded_write_command (dev, ABORT_TRANSMISSION);
@@ -418,7 +418,7 @@ sja1000_read_frames (SJA1000_METHOD_ARGS)
     int i;
     int result = 0;
 
-    /* DPRINTK(KERN_DEBUG "%s: sja1000_read_frames()\n", DEVICE_NAME); */
+    /* DPRINTK(KERN_DEBUG "[%s]: sja1000_read_frames()\n", DEVICE_NAME); */
 
     do
     {
@@ -606,7 +606,7 @@ __sja1000_write (SJA1000_METHOD_ARGS)
     dev_stats._write_count++;
 #endif
 
-    /* DPRINTK(KERN_DEBUG "%s: sja1000_write() %d\n", DEVICE_NAME, dev->writeFifo.nStored); */
+    /* DPRINTK(KERN_DEBUG "[%s]: sja1000_write() %d\n", DEVICE_NAME, dev->writeFifo.nStored); */
 
     SJA1000_LOCK_IRQSAVE (out_lock);
 
@@ -647,7 +647,7 @@ sja1000_write (SJA1000_METHOD_ARGS)
     dev_stats.write_count++;
 #endif
 
-    /* DPRINTK(KERN_DEBUG "%s: sja1000_write() %d\n", DEVICE_NAME, dev->writeFifo.nStored); */
+    /* DPRINTK(KERN_DEBUG "[%s]: sja1000_write() %d\n", DEVICE_NAME, dev->writeFifo.nStored); */
 
     /* Check if Tx buffer is empty before writing on */
     if (dev->readreg (dev, CHIPSTATUS) & TRANS_BUFFER_STATUS)
@@ -692,7 +692,7 @@ sja1000_irqhandler_common (SJA1000_METHOD_ARGS)
 
     memset (&ef, 0, sizeof (ef));
 
-    /* DPRINTK(KERN_DEBUG "%s: sja1000_base_irqhandler|sja1000_irqhandler_rt()\n", DEVICE_NAME); */
+    /* DPRINTK(KERN_DEBUG "[%s]: sja1000_base_irqhandler|sja1000_irqhandler_rt()\n", DEVICE_NAME); */
 
 #ifdef PCAN_SJA1000_USES_ISR_LOCK
     SPIN_LOCK_IRQSAVE (&dev->isr_lock);
@@ -722,7 +722,7 @@ sja1000_irqhandler_common (SJA1000_METHOD_ARGS)
             int_disabled = 1;
         }
 #endif
-        /* DPRINTK(KERN_DEBUG "%s: sja1000_[base_irqhandler|irqhandler_rt](0x%02x)\n", DEVICE_NAME, irqstatus); */
+        /* DPRINTK(KERN_DEBUG "[%s]: sja1000_[base_irqhandler|irqhandler_rt](0x%02x)\n", DEVICE_NAME, irqstatus); */
 
         dev->dwInterruptCounter++;
         err = 0;
@@ -763,7 +763,7 @@ sja1000_irqhandler_common (SJA1000_METHOD_ARGS)
 
             guarded_write_command (dev, CLEAR_DATA_OVERRUN);
 
-            /* DPRINTK(KERN_DEBUG "%s: %s(%d), DATA_OVR\n", DEVICE_NAME, __FUNCTION__, dev->nMinor); */
+            /* DPRINTK(KERN_DEBUG "[%s]: %s(%d), DATA_OVR\n", DEVICE_NAME, __FUNCTION__, dev->nMinor); */
 
             dev->ucActivityState = ACTIVITY_XMIT;       /* reset to ACTIVITY_IDLE by cyclic timer */
         }
@@ -795,20 +795,20 @@ sja1000_irqhandler_common (SJA1000_METHOD_ARGS)
 #ifdef PCAN_SJA1000_STATS
             dev_stats.int_err_count++;
 #endif
-            /* DPRINTK(KERN_DEBUG "%s: %s(%d), irqstatus=%02Xh\n", DEVICE_NAME, __FUNCTION__, dev->nMinor, irqstatus); */
+            /* DPRINTK(KERN_DEBUG "[%s]: %s(%d), irqstatus=%02Xh\n", DEVICE_NAME, __FUNCTION__, dev->nMinor, irqstatus); */
 
             if (irqstatus & (ERROR_PASSIV_INTERRUPT | ERROR_WARN_INTERRUPT))
             {
                 u8 chipstatus = dev->readreg (dev, CHIPSTATUS);
 
-                /* DPRINTK(KERN_DEBUG "%s: sja1000_irqhandler(), chipstatus=0x%02x\n", DEVICE_NAME, chipstatus); */
+                /* DPRINTK(KERN_DEBUG "[%s]: sja1000_irqhandler(), chipstatus=0x%02x\n", DEVICE_NAME, chipstatus); */
                 switch (chipstatus & (BUS_STATUS | ERROR_STATUS))
                 {
                 case 0x00:
                     /* error active, clear only local status */
                     dev->busStatus = CAN_ERROR_ACTIVE;
                     DPRINTK (KERN_DEBUG
-                             "%s: sja1000_irqhandler(), busStatus=CAN_ERROR_ACTIVE (1)\n",
+                             "[%s]: sja1000_irqhandler(), busStatus=CAN_ERROR_ACTIVE (1)\n",
                              DEVICE_NAME);
                     dev->wCANStatus &= ~(CAN_ERR_BUSOFF | CAN_ERR_BUSHEAVY | CAN_ERR_BUSLIGHT);
                     break;
@@ -818,7 +818,7 @@ sja1000_irqhandler_common (SJA1000_METHOD_ARGS)
                     dev->busStatus = CAN_BUS_OFF;
                     dev->wCANStatus |= CAN_ERR_BUSOFF;
                     ef.can_id |= CAN_ERR_BUSOFF_NETDEV;
-                    DPRINTK (KERN_DEBUG "%s: sja1000_irqhandler(), busStatus=CAN_BUS_OFF\n",
+                    DPRINTK (KERN_DEBUG "[%s]: sja1000_irqhandler(), busStatus=CAN_BUS_OFF\n",
                              DEVICE_NAME);
                     break;
                 case ERROR_STATUS:
@@ -832,7 +832,7 @@ sja1000_irqhandler_common (SJA1000_METHOD_ARGS)
                             dev->wCANStatus &= ~(CAN_ERR_BUSOFF | CAN_ERR_BUSHEAVY);
                             dev->wCANStatus |= CAN_ERR_BUSLIGHT;
                             DPRINTK (KERN_DEBUG
-                                     "%s: sja1000_irqhandler(), busStatus=CAN_ERROR_ACTIVE (2)\n",
+                                     "[%s]: sja1000_irqhandler(), busStatus=CAN_ERROR_ACTIVE (2)\n",
                                      DEVICE_NAME);
                         }
                         else
@@ -844,7 +844,7 @@ sja1000_irqhandler_common (SJA1000_METHOD_ARGS)
                             ef.can_id |= CAN_ERR_CRTL;
                             ef.data[1] |= (CAN_ERR_CRTL_RX_PASSIVE | CAN_ERR_CRTL_TX_PASSIVE);
                             DPRINTK (KERN_DEBUG
-                                     "%s: sja1000_irqhandler(), busStatus=CAN_ERROR_PASSIVE\n",
+                                     "[%s]: sja1000_irqhandler(), busStatus=CAN_ERROR_PASSIVE\n",
                                      DEVICE_NAME);
                         }
                     }
@@ -856,7 +856,7 @@ sja1000_irqhandler_common (SJA1000_METHOD_ARGS)
                         ef.can_id |= CAN_ERR_CRTL;
                         ef.data[1] |= (CAN_ERR_CRTL_RX_WARNING | CAN_ERR_CRTL_TX_WARNING);
                         DPRINTK (KERN_DEBUG
-                                 "%s: sja1000_irqhandler(), busStatus=CAN_ERROR_ACTIVE (3)\n",
+                                 "[%s]: sja1000_irqhandler(), busStatus=CAN_ERROR_ACTIVE (3)\n",
                                  DEVICE_NAME);
                     }
                     break;
@@ -943,11 +943,11 @@ sja1000_probe (struct pcandev *dev)
     u8 tmp;
     u8 _clkdivider = clkdivider (dev);
 
-    DPRINTK (KERN_DEBUG "%s: sja1000_probe()\n", DEVICE_NAME);
+    DPRINTK (KERN_DEBUG "[%s]: sja1000_probe()\n", DEVICE_NAME);
 
     /* trace the clockdivider register to test for sja1000 / 82c200 */
     tmp = dev->readreg (dev, CLKDIVIDER);
-    DPRINTK (KERN_DEBUG "%s: CLKDIVIDER traced (0x%02x)\n", DEVICE_NAME, tmp);
+    DPRINTK (KERN_DEBUG "[%s]: CLKDIVIDER traced (0x%02x)\n", DEVICE_NAME, tmp);
     if (tmp & 0x10)
         goto fail;
 
@@ -958,28 +958,28 @@ sja1000_probe (struct pcandev *dev)
     dev->writereg (dev, CLKDIVIDER, _clkdivider);       /* switch to PeliCAN mode */
     sja1000_irq_disable (dev);  /* precautionary disable interrupts */
     /* wmb(); */
-    DPRINTK (KERN_DEBUG "%s: Hopefully switched to PeliCAN mode\n", DEVICE_NAME);
+    DPRINTK (KERN_DEBUG "[%s]: Hopefully switched to PeliCAN mode\n", DEVICE_NAME);
 
     tmp = dev->readreg (dev, CHIPSTATUS);
-    DPRINTK (KERN_DEBUG "%s: CHIPSTATUS traced (0x%02x)\n", DEVICE_NAME, tmp);
+    DPRINTK (KERN_DEBUG "[%s]: CHIPSTATUS traced (0x%02x)\n", DEVICE_NAME, tmp);
     if ((tmp & 0x30) != 0x30)
         goto fail;
 
     tmp = dev->readreg (dev, INTERRUPT_STATUS);
-    DPRINTK (KERN_DEBUG "%s: INTERRUPT_STATUS traced (0x%02x)\n", DEVICE_NAME, tmp);
+    DPRINTK (KERN_DEBUG "[%s]: INTERRUPT_STATUS traced (0x%02x)\n", DEVICE_NAME, tmp);
     if (tmp & 0xfb)
         goto fail;
 
     tmp = dev->readreg (dev, RECEIVE_MSG_COUNTER);
-    DPRINTK (KERN_DEBUG "%s: RECEIVE_MSG_COUNTER traced (0x%02x)\n", DEVICE_NAME, tmp);
+    DPRINTK (KERN_DEBUG "[%s]: RECEIVE_MSG_COUNTER traced (0x%02x)\n", DEVICE_NAME, tmp);
     if (tmp)
         goto fail;
 
-    DPRINTK (KERN_DEBUG "%s: sja1000_probe() is OK\n", DEVICE_NAME);
+    DPRINTK (KERN_DEBUG "[%s]: sja1000_probe() is OK\n", DEVICE_NAME);
     return 0;
 
   fail:
-    DPRINTK (KERN_DEBUG "%s: sja1000_probe() failed\n", DEVICE_NAME);
+    DPRINTK (KERN_DEBUG "[%s]: sja1000_probe() failed\n", DEVICE_NAME);
 
     return -ENXIO;              /* no such device or address */
 }
@@ -1042,7 +1042,7 @@ sja1000_baud_rate (int rate, int flags)
 
     if (best_error && (rate / best_error < 10))
     {
-        DPRINTK (KERN_ERR "%s: bitrate %d is not possible with %d Hz clock\n", DEVICE_NAME, rate,
+        DPRINTK (KERN_ERR "[%s]: bitrate %d is not possible with %d Hz clock\n", DEVICE_NAME, rate,
                  2 * clock);
 
         return 0;
@@ -1117,7 +1117,7 @@ sja1000_bitrate (u32 dwBitRate)
         wBTR0BTR1 = sja1000_baud_rate (dwBitRate, 0);
     }
 
-    DPRINTK (KERN_DEBUG "%s: sja1000_bitrate(%d) = 0x%04x\n", DEVICE_NAME, dwBitRate, wBTR0BTR1);
+    DPRINTK (KERN_DEBUG "[%s]: sja1000_bitrate(%d) = 0x%04x\n", DEVICE_NAME, dwBitRate, wBTR0BTR1);
 
     return wBTR0BTR1;
 }

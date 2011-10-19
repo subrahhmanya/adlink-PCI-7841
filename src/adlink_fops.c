@@ -80,7 +80,7 @@ pcan_open_path (PCAN_OPEN_PATH_ARGS)
 {
     int err = 0;
 
-    DPRINTK (KERN_DEBUG "%s: pcan_open_path, minor = %d, path = %d.\n",
+    DPRINTK (KERN_DEBUG "[%s]: pcan_open_path, minor = %d, path = %d.\n",
              DEVICE_NAME, dev->nMinor, dev->nOpenPaths);
 
     /* only the first open to this device makes a default init on this device */
@@ -98,7 +98,7 @@ pcan_open_path (PCAN_OPEN_PATH_ARGS)
         err = dev->open (dev);
         if (err)
         {
-            DPRINTK (KERN_DEBUG "%s: can't open interface special parts!\n", DEVICE_NAME);
+            DPRINTK (KERN_DEBUG "[%s]: can't open interface special parts!\n", DEVICE_NAME);
             return err;
         }
 
@@ -107,7 +107,7 @@ pcan_open_path (PCAN_OPEN_PATH_ARGS)
 
         if (err)
         {
-            DPRINTK (KERN_DEBUG "%s: can't request irq from device!\n", DEVICE_NAME);
+            DPRINTK (KERN_DEBUG "[%s]: can't request irq from device!\n", DEVICE_NAME);
             return err;
         }
 
@@ -115,14 +115,14 @@ pcan_open_path (PCAN_OPEN_PATH_ARGS)
         err = dev->device_open (dev, dev->wBTR0BTR1, dev->ucCANMsgType, dev->ucListenOnly);
         if (err)
         {
-            DPRINTK (KERN_DEBUG "%s: can't open device hardware itself!\n", DEVICE_NAME);
+            DPRINTK (KERN_DEBUG "[%s]: can't open device hardware itself!\n", DEVICE_NAME);
             return err;
         }
     }
 
     dev->nOpenPaths++;
 
-    DPRINTK (KERN_DEBUG "%s: pcan_open_path() is OK\n", DEVICE_NAME);
+    DPRINTK (KERN_DEBUG "[%s]: pcan_open_path() is OK\n", DEVICE_NAME);
 
     return 0;
 }
@@ -137,11 +137,11 @@ pcan_search_dev (int major, int minor)
     struct pcandev *dev = (struct pcandev *) NULL;
     struct list_head *ptr;
 
-    DPRINTK (KERN_DEBUG "%s: pcan_search_dev(), major,minor = %d,%d.\n", DEVICE_NAME, major, minor);
+    DPRINTK (KERN_DEBUG "[%s]: pcan_search_dev(), major,minor = %d,%d.\n", DEVICE_NAME, major, minor);
 
     if (list_empty (&pcan_drv.devices))
     {
-        DPRINTK (KERN_DEBUG "%s: no devices to select from!\n", DEVICE_NAME);
+        DPRINTK (KERN_DEBUG "[%s]: no devices to select from!\n", DEVICE_NAME);
         return NULL;
     }
 
@@ -157,7 +157,7 @@ pcan_search_dev (int major, int minor)
 
     if (ptr == &pcan_drv.devices)
     {
-        printk (KERN_DEBUG "%s: didn't find any pcan devices (%d,%d)\n", DEVICE_NAME, major, minor);
+        printk (KERN_DEBUG "[%s]: didn't find any pcan devices (%d,%d)\n", DEVICE_NAME, major, minor);
         return NULL;
     }
 
@@ -170,7 +170,7 @@ pcan_search_dev (int major, int minor)
 void
 pcan_release_path (PCAN_RELEASE_PATH_ARGS)
 {
-    DPRINTK (KERN_DEBUG "%s: pcan_release_path, minor = %d, path = %d.\n",
+    DPRINTK (KERN_DEBUG "[%s]: pcan_release_path, minor = %d, path = %d.\n",
              DEVICE_NAME, dev->nMinor, dev->nOpenPaths);
 
     /* if it's the last release: init the chip for non-intrusive operation */

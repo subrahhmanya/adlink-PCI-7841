@@ -55,13 +55,13 @@ pcan_create_filter_chain (void)
 {
     struct filter_chain *chain = NULL;
 
-    DPRINTK (KERN_DEBUG "%s: pcan_create_filter_chain()\n", DEVICE_NAME);
+    DPRINTK (KERN_DEBUG "[%s]: pcan_create_filter_chain()\n", DEVICE_NAME);
 
     /* alloc a new filter_element */
     chain = (struct filter_chain *) kmalloc (sizeof (struct filter_chain), GFP_KERNEL);
 
     if (!chain)
-        printk (KERN_ERR "%s: Cant't create filter chain!\n", DEVICE_NAME);
+        printk (KERN_ERR "[%s]: Cant't create filter chain!\n", DEVICE_NAME);
     else
     {
         INIT_LIST_HEAD (&chain->anchor);
@@ -82,7 +82,7 @@ pcan_add_filter (void *handle, u32 FromID, u32 ToID, u8 ucMSGTYPE)
     struct filter_element *pfilter;
     struct list_head *ptr, *tmp;
 
-    DPRINTK (KERN_DEBUG "%s: pcan_add_filter(0x%p, 0x%08x, 0x%08x, 0x%02x)\n", DEVICE_NAME, handle,
+    DPRINTK (KERN_DEBUG "[%s]: pcan_add_filter(0x%p, 0x%08x, 0x%08x, 0x%02x)\n", DEVICE_NAME, handle,
              FromID, ToID, ucMSGTYPE);
 
     /* if chain isn't set ignore it */
@@ -108,7 +108,7 @@ pcan_add_filter (void *handle, u32 FromID, u32 ToID, u8 ucMSGTYPE)
              (struct filter_element *) kmalloc (sizeof (struct filter_element),
                                                 GFP_KERNEL)) == NULL)
         {
-            printk (KERN_ERR "%s: Cant't create filter element!\n", DEVICE_NAME);
+            printk (KERN_ERR "[%s]: Cant't create filter element!\n", DEVICE_NAME);
             return -ENOMEM;
         }
 
@@ -138,7 +138,7 @@ pcan_delete_filter_all (void *handle)
     struct filter_element *pfilter;
     struct list_head *ptr, *tmp;
 
-    DPRINTK (KERN_DEBUG "%s: pcan_delete_filter_all(0x%p)\n", DEVICE_NAME, handle);
+    DPRINTK (KERN_DEBUG "[%s]: pcan_delete_filter_all(0x%p)\n", DEVICE_NAME, handle);
 
     if (chain)
     {
@@ -166,7 +166,7 @@ pcan_do_filter (void *handle, u32 can_id)
     struct filter_element *pfilter;
     struct list_head *ptr, *tmp;
 
-    /* DPRINTK(KERN_DEBUG "%s: pcan_filter(0x%p, 0x%08x)\n", DEVICE_NAME, handle, can_id); */
+    /* DPRINTK(KERN_DEBUG "[%s]: pcan_filter(0x%p, 0x%08x)\n", DEVICE_NAME, handle, can_id); */
 
     /* pass always when no filter reset has been done before */
     if ((!chain) || (chain->count <= 0))
@@ -228,7 +228,7 @@ pcan_delete_filter_chain (void *handle)
 {
     struct filter_chain *chain = (struct filter_chain *) handle;
 
-    DPRINTK (KERN_DEBUG "%s: pcan_delete_filter_chain(0x%p)\n", DEVICE_NAME, handle);
+    DPRINTK (KERN_DEBUG "[%s]: pcan_delete_filter_chain(0x%p)\n", DEVICE_NAME, handle);
 
     pcan_delete_filter_all (handle);
 

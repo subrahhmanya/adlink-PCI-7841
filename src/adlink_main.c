@@ -371,19 +371,19 @@ cleanup_module (void)
 {
     DPRINTK (KERN_DEBUG "[%s] cleanup_module()\n", DEVICE_NAME);
 
-//    switch (pcan_drv.wInitStep)
-//    {
-//    case 4:
-//        remove_proc_entry (DEVICE_NAME, NULL);
-//    case 3:
-//        rt_dev_unregister ();
-//    case 1:
-//        class_destroy (pcan_drv.class);
-//        rt_remove_dev_list ();
-//
-//    case 0:
-//        pcan_drv.wInitStep = 0;
-//    }
+    switch (pcan_drv.wInitStep)
+    {
+    case 4:
+        remove_proc_entry (DEVICE_NAME, NULL);
+    case 3:
+        rt_dev_unregister ();
+    case 1:
+        class_destroy (pcan_drv.class);
+        rt_remove_dev_list ();
+
+    case 0:
+        pcan_drv.wInitStep = 0;
+    }
 
     printk (KERN_INFO "[%s] removed.\n", DEVICE_NAME);
 
@@ -454,14 +454,14 @@ init_module (void)
     printk (KERN_INFO "[%s] DEBUG is switched on\n", DEVICE_NAME);
 #endif
 
-//    INIT_LIST_HEAD (&pcan_drv.devices);
-//    INIT_LIST_HEAD (&device_list);
-//
-//    pcan_drv.wDeviceCount = 0;
-//    pcan_drv.class = class_create (THIS_MODULE, "adlink");
-//    pcan_drv.wInitStep = 1;
-//
-//    /* search PCI */
+    INIT_LIST_HEAD (&pcan_drv.devices);
+    INIT_LIST_HEAD (&device_list);
+
+    pcan_drv.wDeviceCount = 0;
+    pcan_drv.class = class_create (THIS_MODULE, "adlink");
+    pcan_drv.wInitStep = 1;
+
+    /* search PCI */
 //    if ((result = pcan_search_and_create_pci_devices ()))
 //        goto fail;
 //
@@ -492,12 +492,12 @@ init_module (void)
 //    printk (KERN_INFO "[%s] major %d.\n", DEVICE_NAME, pcan_drv.nMajor);
 //    return 0;                   // succeed
 //
-//  fail:
-//    cleanup_module ();
+  fail:
+    cleanup_module ();
     return result;
 }
 
 MODULE_AUTHOR ("peter.kotvan@gmail.com");
 MODULE_DESCRIPTION ("Driver for dual-port isolated CAN interface card");
 MODULE_SUPPORTED_DEVICE ("adlink PCI-7841");
-MODULE_LICENSE ("GPL");
+MODULE_LICENSE ("GPL v2");

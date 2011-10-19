@@ -167,7 +167,7 @@ pcan_pci_free_irq (struct pcandev *dev)
 static int
 pcan_pci_cleanup (struct pcandev *dev)
 {
-    DPRINTK (KERN_DEBUG "%s: pcan_pci_cleanup()\n", DEVICE_NAME);
+    DPRINTK (KERN_DEBUG "[%s]: pcan_pci_cleanup()\n", DEVICE_NAME);
 
     switch (dev->wInitStep)
     {
@@ -215,7 +215,7 @@ static int
 pcan_pci_channel_init (struct pcandev *dev, u32 dwConfigPort, u32 dwPort, u16 wIrq,
                        struct pcandev *master_dev)
 {
-    DPRINTK (KERN_DEBUG "%s: pcan_pci_channel_init(), _pci_devices = %d\n", DEVICE_NAME,
+    DPRINTK (KERN_DEBUG "[%s]: pcan_pci_channel_init(), _pci_devices = %d\n", DEVICE_NAME,
              _pci_devices);
 
     dev->props.ucMasterDevice = CHANNEL_MASTER; /* obsolete - will be removed soon */
@@ -291,7 +291,7 @@ pcan_pci_channel_init (struct pcandev *dev, u32 dwConfigPort, u32 dwPort, u16 wI
     _pci_devices++;
     dev->wInitStep = 5;
 
-    printk (KERN_INFO "%s: pci device minor %d found\n", DEVICE_NAME, dev->nMinor);
+    printk (KERN_INFO "[%s]: pci device minor %d found\n", DEVICE_NAME, dev->nMinor);
 
     return 0;
 }
@@ -305,8 +305,7 @@ create_one_pci_device (struct pci_dev *pciDev, int nChannel, struct pcandev *mas
 {
     struct pcandev *local_dev = NULL;
     int result = 0;
-    rt_printk("Vchadzam do create one device\n");
-    DPRINTK (KERN_DEBUG "%s: create_one_pci_device(nChannel=%d)\n", DEVICE_NAME, nChannel);
+    DPRINTK (KERN_DEBUG "[%s]: create_one_pci_device(nChannel=%d)\n", DEVICE_NAME, nChannel);
 
     /* make the first device on board */
     if ((local_dev = (struct pcandev *) kmalloc (sizeof (struct pcandev), GFP_KERNEL)) == NULL)
@@ -351,7 +350,7 @@ create_one_pci_device (struct pci_dev *pciDev, int nChannel, struct pcandev *mas
   fail:
     if (result)
     {
-        DPRINTK (KERN_DEBUG "%s: create_one_pci_device(nChannel=%d) discarded - %d\n", DEVICE_NAME,
+        DPRINTK (KERN_DEBUG "[%s]: create_one_pci_device(nChannel=%d) discarded - %d\n", DEVICE_NAME,
                  nChannel, result);
     }
 
@@ -369,7 +368,7 @@ pcan_search_and_create_pci_devices (void)
     struct pcandev *master_dev = NULL;
 
     /* search pci devices */
-    DPRINTK (KERN_DEBUG "%s: pcan_search_and_create_pci_devices()\n", DEVICE_NAME);
+    DPRINTK (KERN_DEBUG "[%s]: pcan_search_and_create_pci_devices()\n", DEVICE_NAME);
     if (CONFIG_PCI)
     {
         struct pci_dev *pciDev;
@@ -430,7 +429,7 @@ pcan_search_and_create_pci_devices (void)
             while ((pciDev != NULL) && !result);
         }
 
-        DPRINTK (KERN_DEBUG "%s: search_and_create_pci_devices() is OK\n", DEVICE_NAME);
+        DPRINTK (KERN_DEBUG "[%s]: search_and_create_pci_devices() is OK\n", DEVICE_NAME);
 
         if (!result && master_dev)      /* register only if at least one channel was found */
             pcan_pci_register_driver (&pcan_drv.pci_drv);
