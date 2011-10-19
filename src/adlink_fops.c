@@ -102,20 +102,6 @@ pcan_open_path (PCAN_OPEN_PATH_ARGS)
             return err;
         }
 
-        /* special handling: probe here only for dongle devices, connect after init is possible */
-        if ((dev->wType == HW_DONGLE_SJA) || (dev->wType == HW_DONGLE_SJA_EPP))
-        {
-            err = sja1000_probe (dev);  /* no usb here, generic sja1000 call for dongle */
-            if (err)
-            {
-                DPRINTK (KERN_ERR "%s: %s-dongle device minor %d not found (io=0x%04x,irq=%d)\n",
-                         DEVICE_NAME, dev->type, dev->nMinor, dev->port.dng.dwPort,
-                         dev->port.dng.wIrq);
-                dev->release (dev);
-                return err;
-            }
-        }
-
         /* install irq */
         err = dev->req_irq (REQ_IRQ_ARG);
 
