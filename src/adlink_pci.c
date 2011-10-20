@@ -246,11 +246,14 @@ pcan_pci_channel_init (struct pcandev *dev, u32 dwConfigPort, u32 dwPort, u16 wI
     if (!dwPort || !wIrq)
         return -EINVAL;
 
+        DPRINTK(KERN_DEBUG "[%s]: configuration port test -1\n",DEVICE_NAME);
     /* do it only if the device is channel master, and channel 0 is it always */
     if (dev->port.pci.nChannel == 0)
     {
+        DPRINTK(KERN_DEBUG "[%s]: dev->port.pci.dwConfigPort: %p\n",DEVICE_NAME,dev->port.pci.dwConfigPort);
         if (check_mem_region (dev->port.pci.dwConfigPort, PCI_CONFIG_PORT_SIZE))
             return -EBUSY;
+        DPRINTK(KERN_DEBUG "[%s]: configuration port test 1\n",DEVICE_NAME);
 
         request_mem_region (dev->port.pci.dwConfigPort, PCI_CONFIG_PORT_SIZE, "pcan");
 
@@ -259,10 +262,12 @@ pcan_pci_channel_init (struct pcandev *dev, u32 dwConfigPort, u32 dwPort, u16 wI
         dev->port.pci.pvVirtConfigPort = ioremap (dwConfigPort, PCI_CONFIG_PORT_SIZE);
         if (dev->port.pci.pvVirtConfigPort == NULL)
             return -ENODEV;
+        DPRINTK(KERN_DEBUG "[%s]: configuration port test 2\n",DEVICE_NAME);
 
         dev->wInitStep = 2;
 
         /* configuration of the PCI chip, part 2 */
+
         writew (0x0005, dev->port.pci.pvVirtConfigPort + PITA_GPIOICR + 2);     /*set GPIO control register */
 
         writeb (0x00, dev->port.pci.pvVirtConfigPort + PITA_GPIOICR);   /* enable all channels */
@@ -324,15 +329,19 @@ create_one_pci_device (struct pci_dev *pciDev, int nChannel, struct pcandev *mas
 
     local_dev->props.ucExternalClock = 1;
 
-    result = pcan_pci_channel_init (local_dev, (u32) pciDev->resource[0].start,
-                                    (u32) pciDev->resource[1].start + nChannel * PCI_PORT_SIZE ,
+    DPRINTK (KERN_DEBUG "[%s]: pciDev->resource[1].start: %p\n", DEVICE_NAME, pciDev->resource[1].start);
+    DPRINTK (KERN_DEBUG "[%s]: pciDev->resource[2].start: %p\n", DEVICE_NAME, pciDev->resource[2].start);
+    result = pcan_pci_channel_init (local_dev, (u32) pciDev->resource[1].start,
+                                    (u32) pciDev->resource[2].start + nChannel * PCI_PORT_SIZE ,
                                     (u16) pciDev->irq, master_dev);
+    DPRINTK (KERN_DEBUG "[%s]: result (pci_channel_init): %i\n", DEVICE_NAME, result);
 
     if (!result)
         result = sja1000_probe (local_dev);
 
     if (result)
     {
+        DPRINTK (KERN_DEBUG "[%s]: *dev = NULL\n", DEVICE_NAME);
         local_dev->cleanup (local_dev);
         kfree (local_dev);
         *dev = NULL;
@@ -346,6 +355,7 @@ create_one_pci_device (struct pci_dev *pciDev, int nChannel, struct pcandev *mas
         pcan_drv.wDeviceCount++;
         *dev = local_dev;
     }
+    DPRINTK (KERN_DEBUG "[%s]: result (sja1000_probe): %i\n", DEVICE_NAME, result);
 
   fail:
     if (result)

@@ -462,9 +462,9 @@ init_module (void)
     pcan_drv.wInitStep = 1;
 
     /* search PCI */
-//    if ((result = pcan_search_and_create_pci_devices ()))
-//        goto fail;
-//
+    if ((result = pcan_search_and_create_pci_devices ()))
+        goto fail;
+
 //    // no device found, stop all
 //    if (!pcan_drv.wDeviceCount)
 //        goto fail;
@@ -490,9 +490,10 @@ init_module (void)
 //    pcan_drv.wInitStep = 4;
 //
 //    printk (KERN_INFO "[%s] major %d.\n", DEVICE_NAME, pcan_drv.nMajor);
-//    return 0;                   // succeed
-//
+    return 0;                   // succeed
+
   fail:
+    DPRINTK (KERN_DEBUG "[%s] goto -> fail\n", DEVICE_NAME);
     cleanup_module ();
     return result;
 }

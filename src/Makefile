@@ -6,7 +6,7 @@ TARGET = adlink.ko
 
 ifeq ($(DBG),DEBUG)
 VERBOSE = 1
-DEBUG_FLAGS = -O -DDEBUG
+DEBUG_FLAGS = -O -ggdb3 -DDEBUG
 else
 DEBUG_FLAGS = -O2
 endif
@@ -19,6 +19,7 @@ EXTRA_CFLAGS := -I$(PWD) -I/usr/include -I/usr/realtime/include
 EXTRA_CFLAGS += $(DEBUG_FLAGS)
 
 all:
+	make clean
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) V=$(VERBOSE) modules
 	@ctags *.c *.h
 clean:
