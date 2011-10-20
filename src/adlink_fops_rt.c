@@ -91,7 +91,7 @@ pcan_open_rt (struct rtdm_dev_context *context, rtdm_user_info_t * user_info, in
     int _major = MAJOR (context->device->device_id);
     int _minor = MINOR (context->device->device_id);
 
-    DPRINTK (KERN_DEBUG "[%s]: pcan_open_rt(), minor = %d.\n", DEVICE_NAME, _minor);
+    DPRINTK ("pcan_open_rt(), minor = %d.\n", _minor);
 
     ctx = (struct pcanctx_rt *) context->dev_private;
 
@@ -126,11 +126,11 @@ pcan_open_rt (struct rtdm_dev_context *context, rtdm_user_info_t * user_info, in
     err = rtdm_irq_enable (&ctx->irq_handle);
     if (err)
     {
-        DPRINTK (KERN_DEBUG "[%s]: can't enable interrupt\n", DEVICE_NAME);
+        DPRINTK ("can't enable interrupt\n");
         return err;
     }
 
-    DPRINTK (KERN_DEBUG "[%s]: pcan_open_rt() is OK\n", DEVICE_NAME);
+    DPRINTK ("pcan_open_rt() is OK\n");
 
     return err;
 }
@@ -142,7 +142,7 @@ pcan_close_rt (struct rtdm_dev_context *context, rtdm_user_info_t * user_info)
     struct pcandev *dev;
     struct pcanctx_rt *ctx;
 
-    DPRINTK (KERN_DEBUG "[%s]: pcan_close_rt()\n", DEVICE_NAME);
+    DPRINTK ("pcan_close_rt()\n");
 
     ctx = (struct pcanctx_rt *) context->dev_private;
 
@@ -185,7 +185,7 @@ pcan_ioctl_read_rt (rtdm_user_info_t * user_info, struct pcanctx_rt *ctx, TPCANR
     struct pcandev *dev;
     rtdm_lockctx_t lockctx;
 
-    DPRINTK (KERN_DEBUG "[%s]: pcan_ioctl_rt(PCAN_READ_MSG)\n", DEVICE_NAME);
+    DPRINTK ("pcan_ioctl_rt(PCAN_READ_MSG)\n");
 
     dev = ctx->dev;
 
@@ -225,7 +225,7 @@ pcan_ioctl_write_rt (rtdm_user_info_t * user_info, struct pcanctx_rt *ctx, TPCAN
     struct pcandev *dev;
     rtdm_lockctx_t lockctx;
 
-    DPRINTK (KERN_DEBUG "[%s]: pcan_ioctl_rt(PCAN_WRITE_MSG)\n", DEVICE_NAME);
+    DPRINTK ("pcan_ioctl_rt(PCAN_WRITE_MSG)\n");
 
     dev = ctx->dev;
 
@@ -278,7 +278,7 @@ pcan_ioctl_write_rt (rtdm_user_info_t * user_info, struct pcanctx_rt *ctx, TPCAN
         }
         else
         {
-            /* DPRINTK(KERN_DEBUG "[%s]: pushed %d items into Fifo\n", DEVICE_NAME, dev->writeFifo.nStored); */
+            /* DPRINTK("pushed %d items into Fifo\n", dev->writeFifo.nStored); */
         }
     }
 
@@ -295,7 +295,7 @@ pcan_ioctl_extended_status_rt (rtdm_user_info_t * user_info, struct pcanctx_rt *
     struct pcandev *dev;
     TPEXTENDEDSTATUS local;
 
-    DPRINTK (KERN_DEBUG "[%s]: pcan_ioctl_rt(PCAN_GET_EXT_STATUS)\n", DEVICE_NAME);
+    DPRINTK ("pcan_ioctl_rt(PCAN_GET_EXT_STATUS)\n");
 
     dev = ctx->dev;
     local = pcan_ioctl_extended_status_common (dev);
@@ -321,7 +321,7 @@ pcan_ioctl_status_rt (rtdm_user_info_t * user_info, struct pcanctx_rt *ctx, TPST
     struct pcandev *dev;
     TPSTATUS local;
 
-    DPRINTK (KERN_DEBUG "[%s]: pcan_ioctl_rt(PCAN_GET_STATUS)\n", DEVICE_NAME);
+    DPRINTK ("pcan_ioctl_rt(PCAN_GET_STATUS)\n");
 
     dev = ctx->dev;
     local = pcan_ioctl_status_common (dev);
@@ -347,7 +347,7 @@ pcan_ioctl_diag_rt (rtdm_user_info_t * user_info, struct pcanctx_rt *ctx, TPDIAG
     struct pcandev *dev;
     TPDIAG local;
 
-    DPRINTK (KERN_DEBUG "[%s]: pcan_ioctl_rt(PCAN_DIAG)\n", DEVICE_NAME);
+    DPRINTK ("pcan_ioctl_rt(PCAN_DIAG)\n");
 
     dev = ctx->dev;
 
@@ -368,7 +368,7 @@ pcan_ioctl_init_rt (rtdm_user_info_t * user_info, struct pcanctx_rt *ctx, TPCANI
     struct pcandev *dev;
     rtdm_lockctx_t lockctx;
 
-    DPRINTK (KERN_DEBUG "[%s]: pcan_ioctl_rt(PCAN_INIT)\n", DEVICE_NAME);
+    DPRINTK ("pcan_ioctl_rt(PCAN_INIT)\n");
 
     dev = ctx->dev;
 
@@ -416,7 +416,7 @@ pcan_ioctl_BTR0BTR1_rt (rtdm_user_info_t * user_info, struct pcanctx_rt *ctx, TP
     int err = 0;
     TPBTR0BTR1 local;
 
-    DPRINTK (KERN_DEBUG "[%s]: pcan_ioctl_rt(PCAN_BTR0BTR1)\n", DEVICE_NAME);
+    DPRINTK ("pcan_ioctl_rt(PCAN_BTR0BTR1)\n");
 
     if (copy_from_user_rt (user_info, &local, BTR0BTR1, sizeof (local)))
     {
@@ -448,7 +448,7 @@ pcan_ioctl_msg_filter_rt (rtdm_user_info_t * user_info, struct pcanctx_rt *ctx,
     TPMSGFILTER local_filter;
     struct pcandev *dev;
 
-    DPRINTK (KERN_DEBUG "[%s]: pcan_ioctl_rt(PCAN_MSG_FILTER)\n", DEVICE_NAME);
+    DPRINTK ("pcan_ioctl_rt(PCAN_MSG_FILTER)\n");
 
     dev = ctx->dev;
 
@@ -510,12 +510,12 @@ pcan_ioctl_rt (struct rtdm_dev_context *context, rtdm_user_info_t * user_info,
         break;
 
     default:
-        DPRINTK (KERN_DEBUG "[%s]: pcan_ioctl_rt(%d)\n", DEVICE_NAME, request);
+        DPRINTK ("pcan_ioctl_rt(%d)\n", request);
         err = -ENOTTY;
         break;
     }
 
-    DPRINTK (KERN_DEBUG "[%s]: pcan_ioctl()_rt = %d\n", DEVICE_NAME, err);
+    DPRINTK ("pcan_ioctl()_rt = %d\n", err);
     return err;
 }
 

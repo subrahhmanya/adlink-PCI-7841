@@ -43,7 +43,7 @@ pcan_fifo_reset (register FIFO_MANAGER * anchor)
 
     SPIN_UNLOCK_IRQRESTORE (&anchor->lock);
 
-    /* DPRINTK(KERN_DEBUG "[%s]: pcan_fifo_reset() %d %p %pd\n", DEVICE_NAME, anchor->nStored, anchor->r, anchor->w); */
+    /* DPRINTK("pcan_fifo_reset() %d %p %pd\n", anchor->nStored, anchor->r, anchor->w); */
 
     return 0;
 }
@@ -74,7 +74,7 @@ pcan_fifo_put (register FIFO_MANAGER * anchor, void *pvPutData)
     int err = 0;
     DECLARE_SPIN_LOCK_IRQSAVE_FLAGS;
 
-    /* DPRINTK(KERN_DEBUG "[%s]: pcan_fifo_put() %d %p %p\n", DEVICE_NAME, anchor->nStored, anchor->r, anchor->w); */
+    /* DPRINTK("sn_fifo_put() %d %p %p\n", anchor->nStored, anchor->r, anchor->w); */
 
     SPIN_LOCK_IRQSAVE (&anchor->lock);
 
@@ -105,7 +105,7 @@ pcan_fifo_get (register FIFO_MANAGER * anchor, void *pvGetData)
     int err = 0;
     DECLARE_SPIN_LOCK_IRQSAVE_FLAGS;
 
-    /* DPRINTK(KERN_DEBUG "[%s]: pcan_fifo_get() %d %p %p\n", DEVICE_NAME, anchor->nStored, anchor->r, anchor->w); */
+    /* DPRINTK("pcan_fifo_get() %d %p %p\n", anchor->nStored, anchor->r, anchor->w); */
 
     SPIN_LOCK_IRQSAVE (&anchor->lock);
 

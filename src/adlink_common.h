@@ -39,10 +39,16 @@
  */
 #include <generated/autoconf.h>
 
+/**
+ * name of the module and proc entry
+ */
+#define DEVICE_NAME "adlink"
+
 #ifdef DEBUG
-#define DPRINTK printk
+/* #define DPRINTK printk */
+#define DPRINTK(msg, args...) printk(KERN_DEBUG "[adlink]: " msg, ##args)
 #else
-#define DPRINTK(stuff...)
+#define DPRINTK(msg, args...)
 #endif
 
 /**
@@ -71,19 +77,5 @@ rt_gettimeofday (struct timeval *tv)
 #define DECLARE_SPIN_LOCK_IRQSAVE_FLAGS
 #define SPIN_LOCK_IRQSAVE(lock)
 #define SPIN_UNLOCK_IRQRESTORE(lock)
-
-/**
- * disable printks for not debugging
- */
-#ifdef DEBUG
-#define DPRINTK printk
-#else
-#define DPRINTK(stuff...)
-#endif
-
-/**
- * name of the module and proc entry
- */
-#define DEVICE_NAME "adlink"
 
 #endif /* __ADLINK_COMMON_H__ */

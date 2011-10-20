@@ -296,7 +296,7 @@ pcan_read_procmem (char *page, char **start, off_t offset, int count, int *eof, 
     struct list_head *ptr;
     int len = 0;
 
-    DPRINTK (KERN_DEBUG "[%s] pcan_read_procmem()\n", DEVICE_NAME);
+    DPRINTK ("can_read_procmem()\n");
 
     len += sprintf (page + len, "\n");
     len +=
@@ -369,7 +369,7 @@ remove_dev_list (void)
 void
 cleanup_module (void)
 {
-    DPRINTK (KERN_DEBUG "[%s] cleanup_module()\n", DEVICE_NAME);
+    DPRINTK ("cleanup_module()\n");
 
     switch (pcan_drv.wInitStep)
     {
@@ -493,7 +493,6 @@ init_module (void)
     return 0;                   // succeed
 
   fail:
-    DPRINTK (KERN_DEBUG "[%s] goto -> fail\n", DEVICE_NAME);
     cleanup_module ();
     return result;
 }
