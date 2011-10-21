@@ -24,9 +24,15 @@ define make-clean
 @cd src; make clean; cd ..
 endef
 
+define make-install
+@cd src; make install; cd ..
+endef
+
 all:
 	$(make-all)
 
 clean:
 	$(make-clean)
 
+install:
+	$(make-install)
