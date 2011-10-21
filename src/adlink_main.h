@@ -175,6 +175,7 @@ typedef struct pcandev
     void *filter;               /* a ID filter - currently associated to device */
     spinlock_t wlock;           /* mutual exclusion lock for write invocation */
     spinlock_t isr_lock;        /* in isr */
+    int drvRegistered[2];       /* test if driver is registered */
 } PCANDEV;
 
 struct pcanctx_rt

@@ -40,7 +40,7 @@
 #define PEAK_PCI_VENDOR_ID   0x144A     /* the PCI device and vendor IDs */
 #define PEAK_PCI_DEVICE_ID   0x7841     /* ID for PCI / PCIe Slot cards */
 
-#define PCI_CONFIG_PORT_SIZE 0x0100     /* size of the config io-memory */
+#define PCI_CONFIG_PORT_SIZE 0x0080     /* size of the config io-memory */
 #define PCI_PORT_SIZE        0x0080     /* size of a channel io-memory */
 
 static struct pci_device_id pcan_pci_tbl[] = {
@@ -189,8 +189,12 @@ pcan_pci_cleanup (struct pcandev *dev)
         pcan_delete_filter_chain (dev->filter);
         dev->filter = NULL;
         dev->wInitStep = 0;
-        if (_pci_devices == 0)
+        DPRINTK("dev->drvRegistered[0]: %i\n", dev->drvRegistered[0]);
+        if ((_pci_devices == 0) && (dev->drvRegistered[0] == 1))
+        {
+            DPRINTK("pci_devices && dev registered : true");
             pcan_pci_unregister_driver (&pcan_drv.pci_drv);
+        }
     }
 
     return 0;
@@ -248,7 +252,6 @@ pcan_pci_channel_init (struct pcandev *dev, u32 dwConfigPort, u32 dwPort, u16 wI
     /* do it only if the device is channel master, and channel 0 is it always */
     if (dev->port.pci.nChannel == 0)
     {
-        DPRINTK("dev->port.pci.dwConfigPort: %p\n", dev->port.pci.dwConfigPort);
         if (check_mem_region (dev->port.pci.dwConfigPort, PCI_CONFIG_PORT_SIZE))
             return -EBUSY;
         DPRINTK("configuration port test\n");
@@ -323,6 +326,7 @@ create_one_pci_device (struct pci_dev *pciDev, int nChannel, struct pcandev *mas
     local_dev->device_release = sja1000_release;
     local_dev->port.pci.nChannel = nChannel;
     local_dev->port.pci.pciDev = NULL;
+    local_dev->drvRegistered[0] = 0;
 
     local_dev->props.ucExternalClock = 1;
 
@@ -338,7 +342,6 @@ create_one_pci_device (struct pci_dev *pciDev, int nChannel, struct pcandev *mas
 
     if (result)
     {
-        DPRINTK ("*dev = NULL\n");
         local_dev->cleanup (local_dev);
         kfree (local_dev);
         *dev = NULL;
@@ -352,7 +355,6 @@ create_one_pci_device (struct pci_dev *pciDev, int nChannel, struct pcandev *mas
         pcan_drv.wDeviceCount++;
         *dev = local_dev;
     }
-    DPRINTK ("result (sja1000_probe): %i\n", result);
 
   fail:
     if (result)
@@ -435,10 +437,13 @@ pcan_search_and_create_pci_devices (void)
             while ((pciDev != NULL) && !result);
         }
 
-        DPRINTK ("search_and_create_pci_devices() is OK\n");
+        DPRINTK ("search_and_create_pci_devices() ended\n");
 
         if (!result && master_dev)      /* register only if at least one channel was found */
+        {
             pcan_pci_register_driver (&pcan_drv.pci_drv);
+            dev->drvRegistered[0] = 1;
+        }
     }
 
     return result;
