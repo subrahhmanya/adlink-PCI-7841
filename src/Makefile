@@ -7,19 +7,21 @@ TARGET = adlink.ko
 ifeq ($(DBG),DEBUG)
 VERBOSE = 1
 DEBUG_FLAGS = -O -ggdb3 -DDEBUG
+CLEAN = make clean
 else
 DEBUG_FLAGS = -O2
 endif
 
 
 obj-m := adlink.o
-adlink-objs := adlink_main.o adlink_fops.o adlink_fifo.o adlink_filter.o adlink_parse.o adlink_sja1000.o adlink_pci.o
+adlink-objs := adlink_main.o adlink_fops.o adlink_fifo.o adlink_filter.o 
+adlink-objs += adlink_parse.o adlink_sja1000.o adlink_pci.o
 
 EXTRA_CFLAGS := -I$(PWD) -I/usr/include -I/usr/realtime/include 
 EXTRA_CFLAGS += $(DEBUG_FLAGS)
 
 all:
-	make clean
+	$(CLEAN)
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) V=$(VERBOSE) modules
 	@ctags *.c *.h
 clean:
