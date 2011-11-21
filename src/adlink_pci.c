@@ -37,14 +37,14 @@
 #define PITA_GPIOICR     0x18   /* general purpose IO interface control register */
 #define PITA_MISC        0x1C   /* miscellanoes register */
 
-#define PEAK_PCI_VENDOR_ID   0x144A     /* the PCI device and vendor IDs */
-#define PEAK_PCI_DEVICE_ID   0x7841     /* ID for PCI / PCIe Slot cards */
+#define ADLINK_PCI_VENDOR_ID   0x144A     /* the PCI device and vendor IDs */
+#define ADLINK_PCI_DEVICE_ID   0x7841     /* ID for PCI / PCIe Slot cards */
 
-#define PCI_CONFIG_PORT_SIZE 0x0080     /* size of the config io-memory */
-#define PCI_PORT_SIZE        0x0080     /* size of a channel io-memory */
+#define PCI_CONFIG_PORT_SIZE 0x007f     /* size of the config io-memory */
+#define PCI_PORT_SIZE        0x00ff     /* size of a channel io-memory */
 
 static struct pci_device_id pcan_pci_tbl[] = {
-    {PEAK_PCI_VENDOR_ID, PEAK_PCI_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID, 0, 0}, {0,}
+    {ADLINK_PCI_VENDOR_ID, ADLINK_PCI_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID, 0, 0}, {0,}
 };
 
 static int
@@ -189,7 +189,6 @@ pcan_pci_cleanup (struct pcandev *dev)
         pcan_delete_filter_chain (dev->filter);
         dev->filter = NULL;
         dev->wInitStep = 0;
-        DPRINTK("dev->drvRegistered[0]: %i\n", dev->drvRegistered[0]);
         if ((_pci_devices == 0) && (dev->drvRegistered[0] == 1))
         {
             DPRINTK("pci_devices && dev registered : true");
@@ -252,11 +251,12 @@ pcan_pci_channel_init (struct pcandev *dev, u32 dwConfigPort, u32 dwPort, u16 wI
     /* do it only if the device is channel master, and channel 0 is it always */
     if (dev->port.pci.nChannel == 0)
     {
-        if (check_mem_region (dev->port.pci.dwConfigPort, PCI_CONFIG_PORT_SIZE))
+        DPRINTK ("dev->port.pci.dwConfigPort: %p\n", dev->port.pci.dwConfigPort);
+        if (check_region (dev->port.pci.dwConfigPort, PCI_CONFIG_PORT_SIZE))
             return -EBUSY;
-        DPRINTK("configuration port test\n");
+        DPRINTK("Config port check_region succesful.\n");
 
-        request_mem_region (dev->port.pci.dwConfigPort, PCI_CONFIG_PORT_SIZE, "pcan");
+        request_region (dev->port.pci.dwConfigPort, PCI_CONFIG_PORT_SIZE, "pcan");
 
         dev->wInitStep = 1;
 
@@ -280,10 +280,12 @@ pcan_pci_channel_init (struct pcandev *dev, u32 dwConfigPort, u32 dwPort, u16 wI
     else
         dev->port.pci.pvVirtConfigPort = master_dev->port.pci.pvVirtConfigPort;
 
-    if (check_mem_region (dev->port.pci.dwPort, PCI_PORT_SIZE))
+    DPRINTK ("dev->port.pci.dwPort: %p\n", dev->port.pci.dwPort);
+    if (check_region (dev->port.pci.dwPort, PCI_PORT_SIZE))
         return -EBUSY;
+    DPRINTK("First port check_region succesful.\n");
 
-    request_mem_region (dev->port.pci.dwPort, PCI_PORT_SIZE, "pcan");
+    request_region (dev->port.pci.dwPort, PCI_PORT_SIZE, "pcan");
 
     dev->wInitStep = 3;
 
@@ -335,7 +337,7 @@ create_one_pci_device (struct pci_dev *pciDev, int nChannel, struct pcandev *mas
     result = pcan_pci_channel_init (local_dev, (u32) pciDev->resource[1].start,
                                     (u32) pciDev->resource[2].start + nChannel * PCI_PORT_SIZE ,
                                     (u16) pciDev->irq, master_dev);
-    DPRINTK ("result (pci_channel_init): %i\n", result);
+    DPRINTK ("Channel %i init result: %i\n", nChannel, result);
 
     if (!result)
         result = sja1000_probe (local_dev);
@@ -420,14 +422,9 @@ pcan_search_and_create_pci_devices (void)
                         goto fail;
                     master_dev = dev;
 
-                    if (wSubSysID >= 4) /* add a 2nd channel per card */
-                        if ((result = create_one_pci_device (pciDev, 1, master_dev, &dev)))
-                            goto fail;
-                    if (wSubSysID >= 10)        /* add a 3rd channel per card */
-                        if ((result = create_one_pci_device (pciDev, 2, master_dev, &dev)))
-                            goto fail;
-                    if (wSubSysID >= 12)        /* add the 4th channel per card */
-                        result = create_one_pci_device (pciDev, 3, master_dev, &dev);
+                    /* add a 2nd channel per card */
+//                    if ((result = create_one_pci_device (pciDev, 1, master_dev, &dev)))
+//                        goto fail;
 
                   fail:
                     if (result)

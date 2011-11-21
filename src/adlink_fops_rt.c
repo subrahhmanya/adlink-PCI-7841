@@ -551,8 +551,8 @@ struct rtdm_device pcandev_rt = {
      },
 
   device_class:RTDM_CLASS_CAN,
-  driver_name:"pcan_driver",
-  provider_name:"PEAK System-Technik GmbH",
+  driver_name:"adlink_driver",
+  provider_name:"adlink",
   proc_name:pcandev_rt.device_name,
 };
 
