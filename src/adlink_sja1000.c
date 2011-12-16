@@ -951,20 +951,20 @@ sja1000_probe (struct pcandev *dev)
     /* wmb(); */
     DPRINTK ("Hopefully switched to PeliCAN mode\n");
 
-    tmp = dev->readreg (dev, CHIPSTATUS);
-    DPRINTK ("CHIPSTATUS traced (0x%02x)\n", tmp);
-    if ((tmp & 0x30) != 0x30)
-        goto fail;
+//    tmp = dev->readreg (dev, CHIPSTATUS);
+//    DPRINTK ("CHIPSTATUS traced (0x%02x)\n", tmp);
+//    if ((tmp & 0x30) != 0x30)
+//        goto fail;
 
-    tmp = dev->readreg (dev, INTERRUPT_STATUS);
-    DPRINTK ("INTERRUPT_STATUS traced (0x%02x)\n", tmp);
-    if (tmp & 0xfb)
-        goto fail;
+//    tmp = dev->readreg (dev, INTERRUPT_STATUS);
+//    DPRINTK ("INTERRUPT_STATUS traced (0x%02x)\n", tmp);
+//    if (tmp & 0xfb)
+//        goto fail;
 
-    tmp = dev->readreg (dev, RECEIVE_MSG_COUNTER);
-    DPRINTK ("RECEIVE_MSG_COUNTER traced (0x%02x)\n", tmp);
-    if (tmp)
-        goto fail;
+//    tmp = dev->readreg (dev, RECEIVE_MSG_COUNTER);
+//    DPRINTK ("RECEIVE_MSG_COUNTER traced (0x%02x)\n", tmp);
+//    if (tmp)
+//        goto fail;
 
     DPRINTK ("sja1000_probe() is OK\n");
     return 0;
