@@ -178,13 +178,15 @@ pcan_pci_cleanup (struct pcandev *dev)
     case 4:
         iounmap (dev->port.pci.pvVirtPort);
     case 3:
-        release_mem_region (dev->port.pci.dwPort, PCI_PORT_SIZE);
+//        release_mem_region (dev->port.pci.dwPort, PCI_PORT_SIZE);
+        release_region (dev->port.pci.dwPort, PCI_PORT_SIZE);
     case 2:
         if (dev->port.pci.nChannel == 0)
             iounmap (dev->port.pci.pvVirtConfigPort);
     case 1:
         if (dev->port.pci.nChannel == 0)
-            release_mem_region (dev->port.pci.dwConfigPort, PCI_CONFIG_PORT_SIZE);
+//            release_mem_region (dev->port.pci.dwConfigPort, PCI_CONFIG_PORT_SIZE);
+            release_region (dev->port.pci.dwConfigPort, PCI_CONFIG_PORT_SIZE);
     case 0:
         pcan_delete_filter_chain (dev->filter);
         dev->filter = NULL;
