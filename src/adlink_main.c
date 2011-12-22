@@ -94,6 +94,7 @@ rt_dev_register (void)
         snprintf (rtdmdev->device_name, RTDM_MAX_DEVNAME_LEN, "pcan%d", dev->nMinor);
         rtdmdev->proc_name = rtdmdev->device_name;
         result = rtdm_dev_register (rtdmdev);
+        DPRINTK("rtdm_dev_register return value: %i\n",result);
 
         if (!result)
         {
@@ -465,31 +466,31 @@ init_module (void)
     if ((result = pcan_search_and_create_pci_devices ()))
         goto fail;
 
-//    // no device found, stop all
-//    if (!pcan_drv.wDeviceCount)
-//        goto fail;
-//
-//    pcan_drv.wInitStep = 2;
-//
-//    result = rt_dev_register ();
-//    if (result < 0)
-//        goto fail;
-//
-//    if (!pcan_drv.nMajor)
-//        pcan_drv.nMajor = result;
-//
-//    pcan_drv.wInitStep = 3;
-//
-//    // create the proc entry
-//    if (create_proc_read_entry (DEVICE_NAME, 0, NULL, pcan_read_procmem, NULL) == NULL)
-//    {
-//        result = -ENODEV;       // maybe wrong if there is no proc filesystem configured
-//        goto fail;
-//    }
-//
-//    pcan_drv.wInitStep = 4;
-//
-//    printk (KERN_INFO "[%s] major %d.\n", DEVICE_NAME, pcan_drv.nMajor);
+    // no device found, stop all
+    if (!pcan_drv.wDeviceCount)
+        goto fail;
+
+    pcan_drv.wInitStep = 2;
+    
+    result = rt_dev_register ();
+    if (result < 0)
+        goto fail;
+
+    if (!pcan_drv.nMajor)
+        pcan_drv.nMajor = result;
+
+    pcan_drv.wInitStep = 3;
+
+    // create the proc entry
+    if (create_proc_read_entry (DEVICE_NAME, 0, NULL, pcan_read_procmem, NULL) == NULL)
+    {
+        result = -ENODEV;       // maybe wrong if there is no proc filesystem configured
+        goto fail;
+    }
+
+    pcan_drv.wInitStep = 4;
+
+    printk (KERN_INFO "[%s] major %d.\n", DEVICE_NAME, pcan_drv.nMajor);
     return 0;                   // succeed
 
   fail:
