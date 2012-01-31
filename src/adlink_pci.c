@@ -41,7 +41,7 @@
 #define ADLINK_PCI_DEVICE_ID   0x7841     /* ID for PCI / PCIe Slot cards */
 
 #define PCI_CONFIG_PORT_SIZE 0x007f     /* size of the config io-memory */
-#define PCI_PORT_SIZE        0x00ff     /* size of a channel io-memory */
+#define PCI_PORT_SIZE        0x007f     /* size of a channel io-memory */
 
 static struct pci_device_id pcan_pci_tbl[] = {
     {ADLINK_PCI_VENDOR_ID, ADLINK_PCI_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID, 0, 0}, {0,}
@@ -337,7 +337,7 @@ create_one_pci_device (struct pci_dev *pciDev, int nChannel, struct pcandev *mas
     DPRINTK ("pciDev->resource[1].start: %p\n", pciDev->resource[1].start);
     DPRINTK ("pciDev->resource[2].start: %p\n", pciDev->resource[2].start);
     result = pcan_pci_channel_init (local_dev, (u32) pciDev->resource[1].start,
-                                    (u32) pciDev->resource[2].start + nChannel * PCI_PORT_SIZE ,
+                                    (u32) pciDev->resource[2].start + nChannel * 0x0080,
                                     (u16) pciDev->irq, master_dev);
     DPRINTK ("Channel %i init result: %i\n", nChannel, result);
 

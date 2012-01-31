@@ -89,11 +89,12 @@ rt_dev_register (void)
             return -ENOMEM;
         }
 
-        memcpy (rtdmdev, &pcandev_rt, sizeof (struct rtdm_device));
+        memcpy (rtdmdev, &adlinkdev_rt, sizeof (struct rtdm_device));
         rtdmdev->device_id = MKDEV (dev->nMajor, dev->nMinor);
-        snprintf (rtdmdev->device_name, RTDM_MAX_DEVNAME_LEN, "pcan%d", dev->nMinor);
+        snprintf (rtdmdev->device_name, RTDM_MAX_DEVNAME_LEN, "adlink%d", dev->nMinor);
         rtdmdev->proc_name = rtdmdev->device_name;
         result = rtdm_dev_register (rtdmdev);
+        DPRINTK("rtdm_dev_register return value: %i\n",result);
 
         if (!result)
         {
@@ -489,7 +490,7 @@ init_module (void)
 
     pcan_drv.wInitStep = 4;
 
-    printk (KERN_INFO "[%s] major %d.\n", DEVICE_NAME, pcan_drv.nMajor);
+    printk (KERN_INFO "[%s]: major %d.\n", DEVICE_NAME, pcan_drv.nMajor);
     return 0;                   // succeed
 
   fail:
