@@ -30,6 +30,6 @@ TPEXTENDEDSTATUS pcan_ioctl_extended_status_common (struct pcandev *dev);
 TPSTATUS pcan_ioctl_status_common (struct pcandev *dev);
 TPDIAG pcan_ioctl_diag_common (struct pcandev *dev);
 
-extern struct rtdm_device pcandev_rt;
+extern struct rtdm_device adlinkdev_rt;
 
 #endif /* _ADLINK_FOPS_H */

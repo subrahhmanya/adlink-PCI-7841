@@ -520,7 +520,7 @@ pcan_ioctl_rt (struct rtdm_dev_context *context, rtdm_user_info_t * user_info,
 }
 
 /* this structure is used in init_module(void) */
-struct rtdm_device pcandev_rt = {
+struct rtdm_device adlinkdev_rt = {
   struct_version:RTDM_DEVICE_STRUCT_VER,
 
   device_flags:RTDM_NAMED_DEVICE,
@@ -553,7 +553,7 @@ struct rtdm_device pcandev_rt = {
   device_class:RTDM_CLASS_CAN,
   driver_name:"adlink_driver",
   provider_name:"adlink",
-  proc_name:pcandev_rt.device_name,
+  proc_name:adlinkdev_rt.device_name,
 };
 
 /* end of file */
