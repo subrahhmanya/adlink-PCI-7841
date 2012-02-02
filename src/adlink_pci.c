@@ -70,6 +70,7 @@ static u8
 pcan_pci_readreg (struct pcandev *dev, u8 port) /* read a register */
 {
     u32 lPort = port << 2;
+    DPRINTK("dev->port.pci.pvVirtPort: %x\n",dev->port.pci.pvVirtPort + lPort);
     return readb (dev->port.pci.pvVirtPort + lPort);
 }
 
@@ -258,7 +259,7 @@ pcan_pci_channel_init (struct pcandev *dev, u32 dwConfigPort, u32 dwPort, u16 wI
             return -EBUSY;
         DPRINTK("Config port check_region succesful.\n");
 
-        request_region (dev->port.pci.dwConfigPort, PCI_CONFIG_PORT_SIZE, "pcan");
+        request_region (dev->port.pci.dwConfigPort, PCI_CONFIG_PORT_SIZE, "adlink");
 
         dev->wInitStep = 1;
 
@@ -287,7 +288,7 @@ pcan_pci_channel_init (struct pcandev *dev, u32 dwConfigPort, u32 dwPort, u16 wI
         return -EBUSY;
     DPRINTK("First port check_region succesful.\n");
 
-    request_region (dev->port.pci.dwPort, PCI_PORT_SIZE, "pcan");
+    request_region (dev->port.pci.dwPort, PCI_PORT_SIZE, "adlink");
 
     dev->wInitStep = 3;
 
@@ -336,6 +337,7 @@ create_one_pci_device (struct pci_dev *pciDev, int nChannel, struct pcandev *mas
 
     DPRINTK ("pciDev->resource[1].start: %p\n", pciDev->resource[1].start);
     DPRINTK ("pciDev->resource[2].start: %p\n", pciDev->resource[2].start);
+    DPRINTK ("pciDev->resource[3].start: %p\n", pciDev->resource[3].start);
     result = pcan_pci_channel_init (local_dev, (u32) pciDev->resource[1].start,
                                     (u32) pciDev->resource[2].start + nChannel * 0x0080,
                                     (u16) pciDev->irq, master_dev);
@@ -425,8 +427,8 @@ pcan_search_and_create_pci_devices (void)
                     master_dev = dev;
 
                     /* add a 2nd channel per card */
-//                    if ((result = create_one_pci_device (pciDev, 1, master_dev, &dev)))
-//                        goto fail;
+                    if ((result = create_one_pci_device (pciDev, 1, master_dev, &dev)))
+                        goto fail;
 
                   fail:
                     if (result)

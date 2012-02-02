@@ -939,8 +939,8 @@ sja1000_probe (struct pcandev *dev)
     /* trace the clockdivider register to test for sja1000 / 82c200 */
     tmp = dev->readreg (dev, CLKDIVIDER);
     DPRINTK ("CLKDIVIDER traced (0x%02x)\n", tmp);
-    if (tmp & 0x10)
-        goto fail;
+//    if (tmp & 0x10)
+//        goto fail;
 
     /* until here, it's either a 82c200 or a sja1000 */
     if (set_reset_mode (dev))
