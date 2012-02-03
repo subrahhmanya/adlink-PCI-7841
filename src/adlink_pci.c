@@ -70,7 +70,6 @@ static u8
 pcan_pci_readreg (struct pcandev *dev, u8 port) /* read a register */
 {
     u32 lPort = port << 2;
-    DPRINTK("dev->port.pci.pvVirtPort: %x\n",dev->port.pci.pvVirtPort + lPort);
     return readb (dev->port.pci.pvVirtPort + lPort);
 }
 
@@ -335,9 +334,10 @@ create_one_pci_device (struct pci_dev *pciDev, int nChannel, struct pcandev *mas
 
     local_dev->props.ucExternalClock = 1;
 
-    DPRINTK ("pciDev->resource[1].start: %p\n", pciDev->resource[1].start);
-    DPRINTK ("pciDev->resource[2].start: %p\n", pciDev->resource[2].start);
-    DPRINTK ("pciDev->resource[3].start: %p\n", pciDev->resource[3].start);
+/*     DPRINTK ("pciDev->resource[1].start: %p\n", pciDev->resource[1].start);
+ *     DPRINTK ("pciDev->resource[2].start: %p\n", pciDev->resource[2].start);
+ *     DPRINTK ("pciDev->resource[3].start: %p\n", pciDev->resource[3].start);
+ */
     result = pcan_pci_channel_init (local_dev, (u32) pciDev->resource[1].start,
                                     (u32) pciDev->resource[2].start + nChannel * 0x0080,
                                     (u16) pciDev->irq, master_dev);
